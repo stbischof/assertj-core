@@ -1,4 +1,16 @@
 /*
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * Copyright 2012-2021 the original author or authors.
+ */
+/*
  /*
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -56,18 +68,27 @@ public final class VerboseCondition<T, EXPECTED> extends Condition<T> {
 
   }
 
-  public static <T,EXPECTED> VerboseCondition<T,EXPECTED> descriptive(EXPECTED expectedValue, BiPredicate<T, EXPECTED> matchesBiPredicate) {
-	  return new VerboseCondition<T, EXPECTED>(expectedValue,matchesBiPredicate,"",null,null);
+    public static <T> VerboseCondition<T, Condition<T>> verbose(Condition<T> condition) {
+        return new VerboseCondition<T, Condition<T>>(condition, new BiPredicate<T, Condition<T>>() {
+            @Override
+            public boolean test(T value, Condition<T> condition) {
+                return condition.matches(value);
+            }
+        }, "", null, null);
+    }
+  
+  public static <T,EXPECTED> VerboseCondition<T,EXPECTED> verbose(EXPECTED expectedValue, BiPredicate<T, EXPECTED> matchesBiPredicate) {
+      return new VerboseCondition<T, EXPECTED>(expectedValue,matchesBiPredicate,"",null,null);
   }
   
-  public static <T,EXPECTED> VerboseCondition<T,EXPECTED> descriptive(EXPECTED expectedValue, BiPredicate<T, EXPECTED> matchesBiPredicate,
-	      String matchDescription) {
-	  return new VerboseCondition<T, EXPECTED>(expectedValue,matchesBiPredicate,matchDescription,null,null);
+  public static <T,EXPECTED> VerboseCondition<T,EXPECTED> verbose(EXPECTED expectedValue, BiPredicate<T, EXPECTED> matchesBiPredicate,
+          String matchDescription) {
+      return new VerboseCondition<T, EXPECTED>(expectedValue,matchesBiPredicate,matchDescription,null,null);
   }
   public static <T,EXPECTED> VerboseCondition<T,EXPECTED> verbose(EXPECTED expectedValue, BiPredicate<T, EXPECTED> matchesBiPredicate,
-	      String matchDescription, Function<EXPECTED, ?> expectedValueTransformation,
-	      Function<T, ?> givenValueTransformation) {
-	  return new VerboseCondition<T, EXPECTED>(expectedValue,matchesBiPredicate,matchDescription,expectedValueTransformation,givenValueTransformation);
+          String matchDescription, Function<EXPECTED, ?> expectedValueTransformation,
+          Function<T, ?> givenValueTransformation) {
+      return new VerboseCondition<T, EXPECTED>(expectedValue,matchesBiPredicate,matchDescription,expectedValueTransformation,givenValueTransformation);
   }
   
   private VerboseCondition(EXPECTED expectedValue, BiPredicate<T, EXPECTED> matchesBiPredicate,

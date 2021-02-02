@@ -22,53 +22,72 @@ import org.junit.jupiter.api.Test;
 
 public class VerboseConditionTest {
 
-  /**
-   * 
-   * <pre>
-   * mapped
-     using: StringBuilder::toString magic
-     from: <StringBuilder> foooo
-     to:   <String> foooo
-     then checked: [
-        all of:[
-     [NOT EXECUTED]shorter than 100,
-     [NOT EXECUTED]not be longer 4 (max size),
-     any of:[
-        [NOT EXECUTED]shorter than 100,
-        [NOT EXECUTED]not be longer 4 (max size),
-        all of:[
-           [NOT EXECUTED]shorter than 100,
-           [NOT EXECUTED]not be longer 4 (max size)
-        ]
-     ],
-     [NOT EXECUTED]shorter than 100
-  ]
-  ]
-  [OK] shorter than <100>
-  [FAILED] not be longer <4 (max size)> but was <5 (original word: foooo)>
-   * </pre>
-   */
-  @Test
-  public static void Constructor_test() {
+    /**
+     * 
+     * <pre>
+     * mapped
+       using: StringBuilder::toString magic
+       from: <StringBuilder> foooo
+       to:   <String> foooo
+       then checked: [
+          all of:[
+       [NOT EXECUTED]shorter than 100,
+       [NOT EXECUTED]not be longer 4 (max size),
+       any of:[
+          [NOT EXECUTED]shorter than 100,
+          [NOT EXECUTED]not be longer 4 (max size),
+          all of:[
+             [NOT EXECUTED]shorter than 100,
+             [NOT EXECUTED]not be longer 4 (max size)
+          ]
+       ],
+       [NOT EXECUTED]shorter than 100
+    ]
+    ]
+    [OK] shorter than <100>
+    [FAILED] not be longer <4 (max size)> but was <5 (original word: foooo)>
+     * </pre>
+     */
+    @Test
+    public static void Constructor_test() {
 
-    Condition<String> verboseCondition1 = VerboseCondition.descriptive(100,(String given, Integer expected) -> given.length() < expected,"shorter than");
+        Condition<String> verboseCondition1 = verbose1();
 
-    assertThat(verboseCondition1.toString()).matches("[ ] shorter than <100>");
-    
-    assertThat(verboseCondition1.matches("foooo")).isTrue();
-    System.out.println(verboseCondition1);
-    assertThat(verboseCondition1.toString()).matches("[✓] shorter than <100>");
+        assertThat(verboseCondition1.toString()).matches("[ ] shorter than <100>");
 
-    Condition<String> verboseCondition2 = VerboseCondition.verbose(4,
-    		(String given,Integer expected) -> given.length() < expected,
-            "not be longer",
-            (i) -> i + " (max size)",
-            (s) -> String.format("%s (original word: %s)", s.length(), s));
+        assertThat(verboseCondition1.matches("foooo")).isTrue();
+        System.out.println(verboseCondition1);
+        assertThat(verboseCondition1.toString()).matches("[✓] shorter than <100>");
 
-    assertThat(verboseCondition2.matches("foooo")).isTrue();
-    System.out.println(verboseCondition2);
-    assertThat(verboseCondition2.toString())
-        .matches("[✗] not be longer <4 (max size)> but was <5 (original word: foooo)>");
+        Condition<String> verboseCondition2 = VerboseCondition.verbose(4,
+                (String given, Integer expected) -> given.length() < expected, "not be longer",
+                (i) -> i + " (max size)", (s) -> String.format("%s (original word: %s)", s.length(), s));
 
-  }
+        assertThat(verboseCondition2.matches("foooo")).isTrue();
+        System.out.println(verboseCondition2);
+        assertThat(verboseCondition2.toString())
+                .matches("[✗] not be longer <4 (max size)> but was <5 (original word: foooo)>");
+    }
+
+    @Test
+    public static void output() {
+        Condition<String> c = AnyOf.anyOf(verbose1(), verbose2(), AnyOf.anyOf(verbose1(), verbose2()),
+                AllOf.allOf(verbose1(), verbose2()));
+        c.matches("foooo");
+        
+        System.out.println(c);
+    }
+
+    private static Condition<String> verbose2() {
+        Condition<String> verboseCondition2 = VerboseCondition.verbose(4,
+                (String given, Integer expected) -> given.length() < expected, "not be longer",
+                (i) -> i + " (max size)", (s) -> String.format("%s (original word: %s)", s.length(), s));
+        return verboseCondition2;
+    }
+
+    private static Condition<String> verbose1() {
+        Condition<String> verboseCondition1 = VerboseCondition.verbose(100,
+                (String given, Integer expected) -> given.length() < expected, "shorter than");
+        return verboseCondition1;
+    }
 }
