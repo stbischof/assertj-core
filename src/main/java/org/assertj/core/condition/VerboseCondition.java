@@ -47,27 +47,6 @@ public final class VerboseCondition<T, EXPECTED> extends Condition<T> {
   private Function<EXPECTED, ?> expectedTransformation;
 
 
-  private enum State {
-    NOT_EXECUTED, OK, FAILED
-  }
-
-  public static Function<State, String> defaultState() {
-
-    return state -> {
-      switch (state) {
-        case NOT_EXECUTED:
-          return "[ ]";
-        case OK:
-          return "[✓] ";
-        case FAILED:
-          return "[✗] ";
-        default:
-          return "[?] ";
-      }
-    };
-
-  }
-
     public static <T> VerboseCondition<T, Condition<T>> verbose(Condition<T> condition) {
         return new VerboseCondition<T, Condition<T>>(condition, new BiPredicate<T, Condition<T>>() {
             @Override
@@ -99,7 +78,7 @@ public final class VerboseCondition<T, EXPECTED> extends Condition<T> {
     this.matchDescription = matchDescription;
     this.expectedTransformation = expectedValueTransformation;
     this.givenValueTransformation = givenValueTransformation;
-    describedAs("%s%s %s", defaultState().apply(State.NOT_EXECUTED), matchDescription,
+    describedAs("%s %s",matchDescription,
         transformIf(expectedValueTransformation, expectedValue));
   }
 
@@ -108,10 +87,10 @@ public final class VerboseCondition<T, EXPECTED> extends Condition<T> {
 
     boolean match = matchesBiPredicate.test(value, expectedValue);
     if (match) {
-      describedAs("%s%s <%s>", defaultState().apply(State.OK), matchDescription,
+      describedAs("%s <%s>", matchDescription,
           transformIf(expectedTransformation, expectedValue));
     } else {
-      describedAs("%s%s <%s> but was <%s>", defaultState().apply(State.FAILED), matchDescription,
+      describedAs("%s <%s> but was <%s>", matchDescription,
           transformIf(expectedTransformation, expectedValue), transformIf(givenValueTransformation, value));
     }
     return match;

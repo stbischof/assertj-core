@@ -25,27 +25,22 @@ public class VerboseConditionTest {
     /**
      * 
      * <pre>
-     * mapped
-       using: StringBuilder::toString magic
-       from: <StringBuilder> foooo
-       to:   <String> foooo
-       then checked: [
-          all of:[
-       [NOT EXECUTED]shorter than 100,
-       [NOT EXECUTED]not be longer 4 (max size),
+       all of:[
+        shorter than 100,
+        not be longer 4 (max size),
        any of:[
-          [NOT EXECUTED]shorter than 100,
-          [NOT EXECUTED]not be longer 4 (max size),
+          shorter than 100,
+          not be longer 4 (max size),
           all of:[
-             [NOT EXECUTED]shorter than 100,
-             [NOT EXECUTED]not be longer 4 (max size)
+             shorter than 100,
+             not be longer 4 (max size)
           ]
        ],
-       [NOT EXECUTED]shorter than 100
+       shorter than 100
     ]
     ]
-    [OK] shorter than <100>
-    [FAILED] not be longer <4 (max size)> but was <5 (original word: foooo)>
+    shorter than <100>
+    not be longer <4 (max size)> but was <5 (original word: foooo)>
      * </pre>
      */
     @Test
@@ -53,11 +48,11 @@ public class VerboseConditionTest {
 
         Condition<String> verboseCondition1 = verbose1();
 
-        assertThat(verboseCondition1.toString()).matches("[ ] shorter than <100>");
+        assertThat(verboseCondition1.toString()).matches("shorter than <100>");
 
         assertThat(verboseCondition1.matches("foooo")).isTrue();
         System.out.println(verboseCondition1);
-        assertThat(verboseCondition1.toString()).matches("[✓] shorter than <100>");
+        assertThat(verboseCondition1.toString()).matches("shorter than <100>");
 
         Condition<String> verboseCondition2 = VerboseCondition.verbose(4,
                 (String given, Integer expected) -> given.length() < expected, "not be longer",
@@ -66,7 +61,7 @@ public class VerboseConditionTest {
         assertThat(verboseCondition2.matches("foooo")).isTrue();
         System.out.println(verboseCondition2);
         assertThat(verboseCondition2.toString())
-                .matches("[✗] not be longer <4 (max size)> but was <5 (original word: foooo)>");
+                .matches("not be longer <4 (max size)> but was <5 (original word: foooo)>");
     }
 
     @Test
